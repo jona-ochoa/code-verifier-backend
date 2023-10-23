@@ -20,7 +20,7 @@ server.use(express.json({ limit: '50mb' }))
 server.use('/api', routes)
 
 // * Static Server
-server.use(expres.static('public'))
+server.use(express.static('public'))
 
 // * Redirection config
 server.get('/', (req: Request, res: Response) => {
