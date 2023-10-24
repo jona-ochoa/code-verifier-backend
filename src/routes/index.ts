@@ -4,7 +4,8 @@
  */
 
 import express, { Response, Request } from 'express';
-import helloRouter from './Hello.routes';
+import helloRouter from './HelloRoutes';
+import usersRoutes from './UsersRoutes';
 import { LogInfo } from '../utils/logger';
 
 let routes = express()
@@ -17,5 +18,6 @@ rootRouter.get('/', (req: Request, res: Response) => {
 
 routes.use('/', rootRouter) // http://localhost:8000/api
 routes.use('/hello', helloRouter) // http://localhost:8000/api/hello
+routes.use('/users', usersRoutes) // http://localhost:8000/api/users
 
 export default routes;

@@ -4,12 +4,12 @@
   "description": "Backend node & express",
   "main": "index.js",
   "scripts": {
-    "dev": "concurrently \"npx tsc --watch\" \"npm run swagger\" \"nodemon -q dist/index.js\"",
-    "start": "node dist/index.js",
-    "test": "jest",
     "swagger": "tsoa spec",
+    "dev": "concurrently \"npx tsc --watch\" \"npm run swagger\" \"nodemon -q dist/index.js\"",
+    "test": "jest",
     "serve:coverage": "npm run test && cd coverage/lcov-report && npx serve",
     "build": "npx webpack --mode development",
+    "start": "node dist/index.js",
     "build:prod": "npx webpack --mode production"
   },
   "repository": {
