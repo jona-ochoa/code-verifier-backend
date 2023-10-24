@@ -1,5 +1,6 @@
 import { userEntity } from "../entities/User.entity";
 import { LogError, LogSuccess } from "../../utils/logger";
+import { IUser } from "../interfaces/IUser.interface";
 
 /**
  * Method to obtain all Users from collection "Users" in mongodb
@@ -56,5 +57,3 @@ export const updateUserById = async (id: string, user: any): Promise<any | undef
         LogError(`[ORM Error]: Updating User ${id}: ${error}`)
     }
 }
-
-// Get User By email

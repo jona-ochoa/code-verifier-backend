@@ -19,7 +19,7 @@ export class UserController implements IUserController {
         let response: any = '';
 
         if (id) {
-            LogSuccess(`[/api/users/:id] Get User By Id: ${id}`);
+            LogSuccess(`[/api/users] Get User By Id: ${id}`);
             response = await getUserById(id)
         } else {
 
@@ -66,12 +66,14 @@ export class UserController implements IUserController {
     public async createUser(user: any): Promise<any> {
 
         let response: any = '';
+
         await createUser(user).then((r) => {
             LogSuccess(`[/api/users] Create User: ${user.name}`);
             response = {
                 message: `User Created successfully: ${user.name}`
             }
         })
+        
         return response;
     }
 

@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import { UserController } from '../controllers/UserController';
 import { LogInfo } from '../utils/logger';
+import { IUser } from '../domain/interfaces/IUser.interface';
+import bcrypt from 'bcrypt';
 
 let usersRoutes = express.Router()
 
@@ -10,27 +12,27 @@ usersRoutes.route('/')
     .get(async (req: Request, res: Response) => {
 
         let id: any = req?.query?.id;
-        LogInfo(`Query param: ${id}`)
+        LogInfo(`Query param: ${id}`);
         // Controller Instance to excute method
-        const controller: UserController = new UserController()
+        const controller: UserController = new UserController();
 
         // Obtain response
-        const response: any = await controller.getUsers(id)
+        const response: any = await controller.getUsers(id);
 
         // Send to client
-        return res.send(response)
+        return res.status(200).json(response);
     })
     .delete(async (req: Request, res: Response) => {
         let id: any = req?.query?.id;
-        LogInfo(`Query param: ${id}`)
+        LogInfo(`Query param: ${id}`);
 
         // Controller Instance to excute method
-        const controller: UserController = new UserController()
+        const controller: UserController = new UserController();
 
         // Obtain response
-        const response: any = await controller.deleteUser(id)
+        const response: any = await controller.deleteUser(id);
         // Send to client
-        return res.send(response)
+        return res.status(200).send(response);
     })
     .post(async (req: Request, res: Response) => {
 
@@ -38,7 +40,7 @@ usersRoutes.route('/')
         let email: any = req?.query?.email;
         let age: any = req?.query?.age;
 
-        const controller: UserController = new UserController()
+        const controller: UserController = new UserController();
 
         let user = {
             name: name,
@@ -47,9 +49,9 @@ usersRoutes.route('/')
         }
 
         // Obtain response 
-        const response: any = await controller.createUser(user)
+        const response: any = await controller.createUser(user);
         // Send to client
-        return res.send(response)
+        return res.status(201).send(response);
     })
     .put(async (req: Request, res: Response) => {
 
@@ -57,9 +59,9 @@ usersRoutes.route('/')
         let name: any = req?.query?.name;
         let email: any = req?.query?.email;
         let age: any = req?.query?.age;
-        LogInfo(`Query params: ${id}, ${name}, ${email}, ${age}`)
+        LogInfo(`Query params: ${id}, ${name}, ${email}, ${age}`);
 
-        const controller: UserController = new UserController()
+        const controller: UserController = new UserController();
 
         let user = {
             name: name,
@@ -68,9 +70,9 @@ usersRoutes.route('/')
         }
 
         // Obtain response
-        const response: any = await controller.updateUser(id, user)
+        const response: any = await controller.updateUser(id, user);
         // Send to client
-        return res.send(response)
+        return res.status(200).send(response);
     })
 
 export default usersRoutes;
