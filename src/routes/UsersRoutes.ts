@@ -2,12 +2,14 @@ import express, { Request, Response } from 'express';
 import { UserController } from '../controllers/UserController';
 import { LogInfo } from '../utils/logger';
 
+import { verifyToken } from '../middlewares/verifyToken.middleware';
+
 let usersRoutes = express.Router()
 
 // --> http://localhost:8000/api/users?id=${id}
 usersRoutes.route('/')
     // --> Get:
-    .get(async (req: Request, res: Response) => {
+    .get(verifyToken, async (req: Request, res: Response) => {
 
         let id: any = req?.query?.id;
         LogInfo(`Query param: ${id}`);
@@ -20,7 +22,7 @@ usersRoutes.route('/')
         // Send to client
         return res.status(200).send(response);
     })
-    .delete(async (req: Request, res: Response) => {
+    .delete(verifyToken, async (req: Request, res: Response) => {
         let id: any = req?.query?.id;
         LogInfo(`Query param: ${id}`);
 
@@ -32,7 +34,7 @@ usersRoutes.route('/')
         // Send to client
         return res.status(200).send(response);
     })
-    .put(async (req: Request, res: Response) => {
+    .put(verifyToken, async (req: Request, res: Response) => {
 
         let id: any = req?.query?.id;
         let name: any = req?.query?.name;
