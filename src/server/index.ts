@@ -5,6 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
+import bodyParser from 'body-parser';
 // TODO HTTPS
 
 import routes from '../routes';
@@ -14,7 +15,8 @@ dotenv.config()
 // * Create Express App
 const server: Express = express();
 
-const mongoURL: string | undefined = process.env.MONGOURL || process.env.MONGO_URL;
+const mongoURL = process.env.MONGOURL || process.env.MONGO_URL;
+if (!mongoURL) throw new Error('No MongoDB URL provided');
 // * Swagger config and route
 server.use(
     '/docs', 
@@ -25,6 +27,8 @@ server.use(
             explorer: true
         }
 }))
+
+server.use(bodyParser.json())
 
 // TODO Mongoose connection
 mongoose

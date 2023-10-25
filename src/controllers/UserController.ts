@@ -3,7 +3,7 @@ import { IUserController } from './interfaces';
 import { LogSuccess, LogError, LogWarning } from '../utils/logger';
 
 // ORM - Users Collection
-import { getAllUsers, getUserById, deleteUserById, createUser, updateUserById } from '../domain/orm/User.orm';
+import { getAllUsers, getUserById, deleteUserById, updateUserById } from '../domain/orm/User.orm';
 
 @Route('/api/users')
 @Tags("UserController")
@@ -21,10 +21,12 @@ export class UserController implements IUserController {
         if (id) {
             LogSuccess(`[/api/users] Get User By Id: ${id}`);
             response = await getUserById(id)
+            response.password = '';
         } else {
 
             LogSuccess(`[/api/users] Get All Users Request`)
             response = await getAllUsers()
+            response.password = '';
         }
 
         return response;
@@ -62,28 +64,8 @@ export class UserController implements IUserController {
      * @param user Create New User
      * @returns Message information if deletion was correct
      */
-    @Post('/')
-    public async createUser(user: any): Promise<any> {
-
-        let response: any = '';
-
-        await createUser(user).then((r) => {
-            LogSuccess(`[/api/users] Create User: ${user.name}`);
-            response = {
-                message: `User Created successfully: ${user.name}`
-            }
-        })
-        
-        return response;
-    }
-
-    /**
-     * Endpoint to create the user in the collection "Users" of DB
-     * @param user Create New User
-     * @returns Message information if deletion was correct
-     */
     @Put('/')
-    public async updateUser(@Query()id: string, user: any): Promise<any> {
+    public async updateUser(@Query() id: string, user: any): Promise<any> {
         let response: any = '';
 
         if (id) {

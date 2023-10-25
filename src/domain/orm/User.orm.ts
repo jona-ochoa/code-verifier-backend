@@ -9,8 +9,15 @@ export const getAllUsers = async (): Promise<any[] | undefined> => {
     try {
         let userModel = userEntity();
 
+        let response: any = {};
+
         // Search all users
-        return await userModel.find({ isDeleted: false })
+        await userModel.find({ isDeleted: false }).then((users: IUser[]) => {
+            response.users = users;
+        });
+
+        return response;
+
     } catch (error) {
         LogError(`[ORM Error]: Getting All Users: ${error}`)
     }
