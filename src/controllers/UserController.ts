@@ -3,7 +3,7 @@ import { IUserController } from './interfaces';
 import { LogSuccess, LogError, LogWarning } from '../utils/logger';
 
 // ORM - Users Collection
-import { getAllUsers, getUserById, deleteUserById, updateUserById } from '../domain/orm/User.orm';
+import { getAllUsers, getUserById, deleteUserById, updateUserById, getAllKatasFromUsers } from '../domain/orm/User.orm';
 
 @Route('/api/users')
 @Tags("UserController")
@@ -15,18 +15,16 @@ export class UserController implements IUserController {
      * @returns All users o user found by id
      */
     @Get('/')
-    public async getUsers(@Query() id?: string): Promise<any> {
+    public async getUsers(@Query() page: number, @Query() limit: number, @Query() id?: string): Promise<any> {
         let response: any = '';
 
         if (id) {
             LogSuccess(`[/api/users] Get User By Id: ${id}`);
             response = await getUserById(id)
-            response.password = '';
         } else {
 
             LogSuccess(`[/api/users] Get All Users Request`)
-            response = await getAllUsers()
-            response.password = '';
+            response = await getAllUsers(page, limit)
         }
 
         return response;
@@ -45,7 +43,7 @@ export class UserController implements IUserController {
             LogSuccess(`[/api/users] Delete User By Id: ${id}`);
             await deleteUserById(id).then((r) => {
                 response = {
-                    massage: `User deleted successfully!`
+                    message: `User id ${id} deleted successfully!`
                 }
             })
         } else {
@@ -72,7 +70,7 @@ export class UserController implements IUserController {
             LogSuccess(`[/api/users] Update User By Id: ${id}`);
             await updateUserById(id, user).then((r) => {
                 response = {
-                    massage: `User with Id ${id} updated successfully!`
+                    message: `User with Id ${id} updated successfully!`
                 }
             })
         } else {
@@ -80,6 +78,22 @@ export class UserController implements IUserController {
             LogWarning(`[/api/users] Update Users WITHOUT ID`)
             response = {
                 message: `Please, provide an ID to updating an existing user`
+            }
+        }
+
+        return response;
+    }
+
+    @Get('/katas')
+    public async getKatas(@Query() page: number, @Query() limit: number, @Query() id?: string): Promise<any> {
+        let response: any = '';
+
+        if (id) {
+            LogSuccess(`[/api/users/katas] Get Katas from User By Id: ${id}`);
+            response = await getAllKatasFromUsers(page, limit, id)
+        } else {
+            response = {
+                message: `ID from user needed`
             }
         }
 

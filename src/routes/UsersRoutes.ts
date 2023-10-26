@@ -10,14 +10,19 @@ let usersRoutes = express.Router()
 usersRoutes.route('/')
     // --> Get:
     .get(verifyToken, async (req: Request, res: Response) => {
-
+        // Obtain a Query Param Id
         let id: any = req?.query?.id;
+        
+        // ¿ Pagination
+
+        let page: any = req?.query?.id || 1;
+        let limit: any = req?.query?.limit || 10;
         LogInfo(`Query param: ${id}`);
         // Controller Instance to excute method
         const controller: UserController = new UserController();
 
         // Obtain response
-        const response: any = await controller.getUsers(id);
+        const response: any = await controller.getUsers(page, limit, id);
 
         // Send to client
         return res.status(200).send(response);
@@ -52,6 +57,26 @@ usersRoutes.route('/')
 
         // Obtain response
         const response: any = await controller.updateUser(id, user);
+        // Send to client
+        return res.status(200).send(response);
+    })
+
+usersRoutes.route('/katas')
+    .get(verifyToken, async (req: Request, res: Response) => {
+        // Obtain a Query Param Id
+        let id: any = req?.query?.id;
+        
+        // ¿ Pagination
+
+        let page: any = req?.query?.id || 1;
+        let limit: any = req?.query?.limit || 10;
+        LogInfo(`Query param: ${id}`);
+        // Controller Instance to excute method
+        const controller: UserController = new UserController();
+
+        // Obtain response
+        const response: any = await controller.getKatas(page, limit, id);
+
         // Send to client
         return res.status(200).send(response);
     })
