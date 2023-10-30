@@ -1,4 +1,4 @@
-import { Get, Route, Tags, Query, Delete, Post, Put } from 'tsoa';
+import { Get, Route, Tags, Query, Delete, Post, Put, Request } from 'tsoa';
 import { IAuthController } from './interfaces';
 import { LogSuccess, LogError, LogWarning } from '../utils/logger';
 
@@ -75,10 +75,24 @@ export class AuthController implements IAuthController {
           return response;
       }
 
-    @Post('/logout')
-    public async logoutUser(): Promise<any> {
-        let response: any = '';
-
-    }
+      @Post('/logout')
+      public async logoutUser(@Request() request: any): Promise<any> {
+          try {
+              // Aquí puedes eliminar el token del usuario desde el sistema de autenticación,
+              // por ejemplo, si utilizas JWT, podrías invalidar el token.
+      
+              // Elimina el token del usuario
+              // Esto es solo un ejemplo y depende de cómo estés gestionando la autenticación y los tokens
+              // Puedes usar alguna librería de manejo de tokens o base de datos para realizar esto.
+              // Ejemplo:
+              // await removeUserToken(request.user.id);
+      
+              LogSuccess(`[/api/auth/logout] User Logged Out: ${request.user.email}`);
+              return { message: 'User logged out successfully' };
+          } catch (error) {
+              LogError(`[/api/auth/logout] Error logging out: ${error}`);
+              return { message: 'Error logging out' };
+          }
+      }   
 }
 
