@@ -1,78 +1,83 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
+import bcrypt from 'bcrypt';
 import { AuthController } from '../controllers/AuthController';
-import { LogInfo } from '../utils/logger';
+import { verifyToken } from '../middlewares/verifyToken.middleware';
 import { IUser } from '../domain/interfaces/IUser.interface';
 import { IAuth } from '../domain/interfaces/IAuth.interface';
 
-import { verifyToken } from '../middlewares/verifyToken.middleware';
-import bodyParser from 'body-parser';
-import bcrypt from 'bcrypt';
+const authRoutes: Router = express.Router();
+const controller: AuthController = new AuthController();
 
-let authRoutes = express.Router();
-let jsonParser = bodyParser.json()
+// Middleware para validar campos requeridos
+function validateFields(req: Request, res: Response, next: Function) {
+    const { name, email, age, password } = req.body;
+    if (!name || !email || !age || !password) {
+        return res.status(400).json({ message: "Missing required fields" });
+    }
+    next();
+}
 
-authRoutes.route('/register')
-    .post(jsonParser, async (req: Request, res: Response) => {
-        let { name, email, age, password } = req?.body;
-        let hashedPassword = '';
+// Registro de usuario
+authRoutes.post('/register', validateFields, async (req: Request, res: Response) => {
+    const { name, email, age, password } = req.body;
+    const hashedPassword = bcrypt.hashSync(password, 8);
+    const newUser: IUser = { name, email, password: hashedPassword, age, katas: [] };
 
-        if (name && email && age && password) {
-            hashedPassword = bcrypt.hashSync(password, 8);
+    try {
+        const response = await controller.registerUser(newUser);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
 
-            let newUser: IUser = {
-                name: name,
-                email: email,
-                password: hashedPassword,
-                age: age,
-                katas: []
-            }
+// Inicio de sesión
+authRoutes.post('/login', async (req: Request, res: Response) => {
+    const { email, password } = req.body;
 
-            const controller: AuthController = new AuthController();
-            const response: any = await controller.registerUser(newUser);
+    if (!email || !password) {
+        return res.status(400).json({ message: "Missing required fields" });
+    }
 
-            return res.status(200).send(response)
-        } else {
-            return res.status(400).send({ message: "Missing required fields" });
-        }
-    })
-authRoutes.route('/login')
-    .post(jsonParser, async (req: Request, res: Response) => {
-        let { email, password } = req?.body;
+    try {
+        const auth: IAuth = { email, password };
+        const response = await controller.loginUser(auth);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(401).json({ message: "Invalid credentials" });
+    }
+});
 
-        if (email && password) {
+// Obtener datos del usuario
+authRoutes.get('/me', verifyToken, async (req: Request, res: Response) => {
+    const id: any = req.query.id;
 
-            const controller: AuthController = new AuthController();
+    if (!id) {
+        return res.status(401).json({ message: "You are not authorized" });
+    }
 
-            let auth: IAuth = {
-                email, password
-            }
+    try {
+        const response = await controller.userData(id);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json({ message: "Internal Server Error" });
+    }
+});
 
-            const response: any = await controller.loginUser(auth);
-
-            return res.status(200).send(response)
-
-        } else {
-            return res.status(400).send({ message: "Missing required fields" });
-        }
-    })
-
-authRoutes.route('/me')
-    .get(verifyToken, async (req: Request, res: Response) => {
-        // Obtain ID of User
-        let id: any = req?.query?.id;
-
-        if (id) {
-            const controller: AuthController = new AuthController();
-
-            let response: any = await controller.userData(id)
-
-            return res.status(200).send(response);
-
-        } else {
-            res.status(401).send({
-                message: `You are not authorized`
-            })
-        }
-    })
+authRoutes.post('/logout', verifyToken, async (req: Request, res: Response) => {
+    try {
+      // Puedes realizar cualquier lógica necesaria para el logout aquí, como invalidar el token del usuario.
+      // Por ejemplo, si utilizas JWT, podrías agregar el token a una lista de tokens inválidos.
+  
+      // Ejemplo:
+      // const token = req.headers.authorization?.split(' ')[1]; // Obtén el token del encabezado
+      // invalidarToken(token); // Implementa esta función según tus necesidades
+  
+      // Finaliza la sesión del usuario
+      res.status(200).json({ message: "User logged out successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  });
 
 export default authRoutes;
